@@ -42,20 +42,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        final double latitude = 31.229316;
+        final double longitude = 121.470591;
         xRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                getForecast(latitude,longitude);
             }
         });
+        getForecast(latitude,longitude);
+        Log.d(TAG,"Main UI");
+
+    }
+
+    private void getForecast(double latitude, double longitude) {
         String apiKey = "7d9ad9898f1ac7024b40e8b42e3102ae";
-        double latitude = 31.229316;
-        double longitude = 121.470591;
-        String forecast = "https://api.darksky.net/forecast/" + apiKey +
+        String forecastUrl = "https://api.darksky.net/forecast/" + apiKey +
                 "/" + latitude + "," + longitude;
         if (isNetworkAvailable()) {
             OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(forecast).build();
+            Request request = new Request.Builder().url(forecastUrl).build();
             Call call = client.newCall(request);
             call.enqueue(new Callback() {
                 @Override
@@ -90,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, R.string.network_condition, Toast.LENGTH_SHORT).show();
         }
-        Log.d(TAG,"Main UI");
-
     }
 
     private void updateData() {
