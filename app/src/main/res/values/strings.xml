@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Cloudly</string>
+    <string name="error_title">Sorry</string>
+    <string name="error_message">Try again</string>
+    <string name="error_ok">OK</string>
+    <string name="network_condition">NetWork is not Available</string>
+</resources>
