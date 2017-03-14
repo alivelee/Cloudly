@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +38,15 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.summaryValue) TextView xSummaryValue;
     @BindView(R.id.iconImageView) ImageView xIconImageView;
     @BindView(R.id.refreshimageView) ImageView xRefreshImageView;
+    @BindView(R.id.progressBar) ProgressBar xProgressBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        xProgressBar.setVisibility(View.INVISIBLE);
         final double latitude = 31.229316;
         final double longitude = 121.470591;
         xRefreshImageView.setOnClickListener(new View.OnClickListener() {
@@ -60,17 +65,30 @@ public class MainActivity extends AppCompatActivity {
         String forecastUrl = "https://api.darksky.net/forecast/" + apiKey +
                 "/" + latitude + "," + longitude;
         if (isNetworkAvailable()) {
+            toggleRefresh();
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder().url(forecastUrl).build();
             Call call = client.newCall(request);
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
+                    alertUserError();
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
                     try {
                         String jsonData = response.body().string();
                         Log.v(TAG, jsonData);
@@ -95,6 +113,16 @@ public class MainActivity extends AppCompatActivity {
             });
         } else {
             Toast.makeText(this, R.string.network_condition, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleRefresh() {
+        if (xProgressBar.getVisibility() == View.INVISIBLE) {
+            xProgressBar.setVisibility(View.VISIBLE);
+            xRefreshImageView.setVisibility(View.INVISIBLE);
+        } else {
+            xProgressBar.setVisibility(View.INVISIBLE);
+            xRefreshImageView.setVisibility(View.VISIBLE);
         }
     }
 
