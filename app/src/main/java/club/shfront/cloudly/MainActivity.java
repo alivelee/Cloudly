@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,11 +36,18 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.precentageValue) TextView xPercentageValue;
     @BindView(R.id.summaryValue) TextView xSummaryValue;
     @BindView(R.id.iconImageView) ImageView xIconImageView;
+    @BindView(R.id.refreshimageView) ImageView xRefreshImageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        xRefreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         String apiKey = "7d9ad9898f1ac7024b40e8b42e3102ae";
         double latitude = 31.229316;
         double longitude = 121.470591;
