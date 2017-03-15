@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.iconImageView) ImageView xIconImageView;
     @BindView(R.id.refreshimageView) ImageView xRefreshImageView;
     @BindView(R.id.progressBar) ProgressBar xProgressBar;
-
+    @BindView(R.id.locationLabel) TextView xLocationLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         xSummaryValue.setText(xCurrentWeather.getSummary());
         Drawable iconDrawable = getResources().getDrawable(xCurrentWeather.getIconId());
         xIconImageView.setImageDrawable(iconDrawable);
+        xLocationLabel.setText(xCurrentWeather.getTimeZone());
+
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {

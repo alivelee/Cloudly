@@ -106,7 +106,8 @@ public class CurrentWeather {
     }
 
     public String getTimeZone() {
-        return xTimeZone;
+        String[] parts = xTimeZone.split("/");
+        return parts[1];
     }
 
     public void setTimeZone(String timeZone) {
