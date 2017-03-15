@@ -1,4 +1,4 @@
-package club.shfront.cloudly;
+package club.shfront.cloudly.weather;
 
 
 import java.text.SimpleDateFormat;
@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class CurrentWeather {
+import club.shfront.cloudly.R;
+
+public class Current {
     private String xIcon;
     private long xTime;
     private double xTemp;
