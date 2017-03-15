@@ -1,4 +1,4 @@
-package club.shfront.cloudly;
+package club.shfront.cloudly.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +21,11 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import club.shfront.cloudly.R;
+import club.shfront.cloudly.weather.Current;
+import club.shfront.cloudly.weather.Daily;
+import club.shfront.cloudly.weather.Forecast;
+import club.shfront.cloudly.weather.Hourly;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -28,7 +34,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
-    private CurrentWeather xCurrentWeather;
+    private Forecast xForecast;
 
 
     @BindView(R.id.timeLabel) TextView xTimeLabel;
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.refreshimageView) ImageView xRefreshImageView;
     @BindView(R.id.progressBar) ProgressBar xProgressBar;
     @BindView(R.id.locationLabel) TextView xLocationLabel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         String jsonData = response.body().string();
                         Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
-                            xCurrentWeather = getCurrentDetails(jsonData);
+                            xForecast = parseForecastDetails(jsonData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -127,32 +134,78 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateData() {
-        xTempLabel.setText(String.format("%s", xCurrentWeather.getTemp()));
-        xTimeLabel.setText("At " + xCurrentWeather.getFormatTime() + " it will be");
-        xHumidityValue.setText(String.format("%s", xCurrentWeather.getHumidity()));
-        xPercentageValue.setText(String.format("%s%%", xCurrentWeather.getPrecentageChance()));
-        xSummaryValue.setText(xCurrentWeather.getSummary());
-        Drawable iconDrawable = getResources().getDrawable(xCurrentWeather.getIconId());
+        Current current = xForecast.getCurrent();
+        xTempLabel.setText(String.format("%s", current.getTemp()));
+        xTimeLabel.setText("At " + current.getFormatTime() + " it will be");
+        xHumidityValue.setText(String.format("%s", current.getHumidity()));
+        xPercentageValue.setText(String.format("%s%%", current.getPrecentageChance()));
+        xSummaryValue.setText(current.getSummary());
+        Drawable iconDrawable = getResources().getDrawable(current.getIconId());
         xIconImageView.setImageDrawable(iconDrawable);
-        xLocationLabel.setText(xCurrentWeather.getTimeZone());
+        xLocationLabel.setText(current.getTimeZone());
 
     }
 
-    private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
+    private Forecast parseForecastDetails(String jsonData) throws JSONException {
+        Forecast forecast = new Forecast();
+        forecast.setCurrent(getCurrentDetails(jsonData));
+        forecast.setHourlyForecast(getHourlyForecast(jsonData));
+        forecast.setDailyForecast(getDailyForecast(jsonData));
+        return forecast;
+    }
+
+    private Daily[] getDailyForecast(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
+        String timeZone = forecast.getString("timezone");
+        JSONObject daily = forecast.getJSONObject("daily");
+        JSONArray data = daily.getJSONArray("data");
+        Daily[] dailys = new Daily[data.length()];
+        for (int i = 0;i < data.length();i++){
+            JSONObject jsonDaily = data.getJSONObject(i);
+            Daily day = new Daily();
+            day.setTimezone(timeZone);
+            day.setSummary(jsonDaily.getString("summary"));
+            day.setTempMax(jsonDaily.getDouble("temperatureMax"));
+            day.setTime(jsonDaily.getLong("time"));
+            dailys[i] = day;
+        }
+        return dailys;
+    }
+
+    private Hourly[] getHourlyForecast(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
+        String timeZone = forecast.getString("timezone");
+        JSONObject hourly = forecast.getJSONObject("hourly");
+        JSONArray data = hourly.getJSONArray("data");
+        Hourly[] hours = new Hourly[data.length()];
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject jsonHour = data.getJSONObject(i);
+            Hourly hour = new Hourly();
+            hour.setSummary(jsonHour.getString("summary"));
+            hour.setTemp(jsonHour.getDouble("temperature"));
+            hour.setIcon(jsonHour.getString("icon"));
+            hour.setTime(jsonHour.getLong("time"));
+            hour.setTimezone(timeZone);
+            hours[i] = hour;
+        }
+        return hours;
+    }
+
+    private Current getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
         String timeZone = forecast.getString("timezone");
         Log.i(TAG,"From JSON: " + timeZone);
         JSONObject currently = forecast.getJSONObject("currently");
-        CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.setHumidity(currently.getDouble("humidity"));
-        currentWeather.setTime(currently.getLong("time"));
-        currentWeather.setIcon(currently.getString("icon"));
-        currentWeather.setPrecentageChance(currently.getDouble("precipProbability"));
-        currentWeather.setTemp(currently.getDouble("temperature"));
-        currentWeather.setSummary(currently.getString("summary"));
-        currentWeather.setTimeZone(timeZone);
-        Log.d(TAG,currentWeather.getFormatTime());
-        return currentWeather;
+        Current current = new Current();
+        current.setHumidity(currently.getDouble("humidity"));
+        current.setTime(currently.getLong("time"));
+        current.setIcon(currently.getString("icon"));
+        current.setPrecentageChance(currently.getDouble("precipProbability"));
+        current.setTemp(currently.getDouble("temperature"));
+        current.setSummary(currently.getString("summary"));
+        current.setTimeZone(timeZone);
+        Log.d(TAG, current.getFormatTime());
+        return current;
     }
 
     private boolean isNetworkAvailable() {

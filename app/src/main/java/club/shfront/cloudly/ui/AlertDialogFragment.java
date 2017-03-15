@@ -1,4 +1,4 @@
-package club.shfront.cloudly;
+package club.shfront.cloudly.ui;
 
 
 import android.app.AlertDialog;
@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+
+import club.shfront.cloudly.R;
 
 public class AlertDialogFragment extends DialogFragment {
     @Override
