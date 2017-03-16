@@ -16,6 +16,7 @@ public class Current {
     private double xPrecentageChance;
     private String xSummary;
     private String xTimeZone;
+    private String xLocation;
 
     public String getIcon() {
         return xIcon;
@@ -26,45 +27,14 @@ public class Current {
     }
 
     public int getIconId(){
-        int iconId = R.mipmap.clear_day;
-        if (xIcon.equals("clear-day")) {
-            iconId = R.mipmap.clear_day;
-        }
-        else if (xIcon.equals("clear-night")) {
-            iconId = R.mipmap.clear_night;
-        }
-        else if (xIcon.equals("rain")) {
-            iconId = R.mipmap.rain;
-        }
-        else if (xIcon.equals("snow")) {
-            iconId = R.mipmap.snow;
-        }
-        else if (xIcon.equals("sleet")) {
-            iconId = R.mipmap.sleet;
-        }
-        else if (xIcon.equals("wind")) {
-            iconId = R.mipmap.wind;
-        }
-        else if (xIcon.equals("fog")) {
-            iconId = R.mipmap.fog;
-        }
-        else if (xIcon.equals("cloudy")) {
-            iconId = R.mipmap.cloudy;
-        }
-        else if (xIcon.equals("partly-cloudy-day")) {
-            iconId = R.mipmap.partly_cloudy;
-        }
-        else if (xIcon.equals("partly-cloudy-night")) {
-            iconId = R.mipmap.cloudy_night;
-        }
-        return iconId;
+        return Forecast.getIconId(xIcon);
     }
     public long getTime() {
         return xTime;
     }
 
     public String getFormatTime(){
-        SimpleDateFormat formatter = new SimpleDateFormat("h:mm a", Locale.US);
+        SimpleDateFormat formatter = new SimpleDateFormat("kk:mm", Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);
@@ -108,11 +78,19 @@ public class Current {
     }
 
     public String getTimeZone() {
-        String[] parts = xTimeZone.split("/");
-        return parts[1];
+        return xTimeZone;
     }
 
     public void setTimeZone(String timeZone) {
         xTimeZone = timeZone;
+    }
+
+    public String getLocation() {
+        String[] parts =  xTimeZone.split("/");
+        return parts[1];
+    }
+
+    public void setLocation(String location) {
+        xLocation = location;
     }
 }
